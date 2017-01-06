@@ -1,6 +1,6 @@
 import os
 import sys
-import random import randint
+from random import randint
 
 a = randint(1000,9999)
 f = open('a.txt','w')

@@ -11,7 +11,7 @@ if __name__ == "__main__":
         sys.exit()
 
     host = sys.argv[1]
-    port = 8888
+    port = 8008
 
 #create an INET, STREAMing socket
 try:
@@ -33,7 +33,10 @@ except socket.gaierror:
 print 'Socket Connected to ' + host + ' on ip ' + remote_ip
 
 #Send some data to remote server
-message = "Test"
+f= open(a.txt,'r')
+s=f.read()
+message = s
+f.close()
 
 try :
     #Set the whole string

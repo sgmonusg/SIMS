@@ -2,8 +2,8 @@ import socket
 import sys
 from thread import *
 
-HOST = ''   # Symbolic name meaning all available interfaces
-PORT = 8888
+HOST = '192.168.0.104'   # Symbolic name meaning all available interfaces
+PORT = 8008
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print 'Socket created'

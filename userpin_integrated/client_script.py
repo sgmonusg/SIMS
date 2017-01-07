@@ -33,12 +33,13 @@ except socket.gaierror:
 print 'Socket Connected to ' + host + ' on ip ' + remote_ip
 
 #Send some data to remote server
-f= open('a.txt','r')
-se=f.read()
-sr = str(se)
-message = sr
-f.close()
-print message
+#f= open('a.txt','r')
+#se=f.read()
+#sr = "\n"+str(se)+"\n"
+#message = sr
+#f.close()
+#print message
+message="\n"+raw_input("Enter data to send to pi: ")+"\n"
 try :
     #Set the whole string
     s.send(message)

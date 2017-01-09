@@ -39,20 +39,20 @@ sr = "\n"+str(se)+"\0"
 pin = sr
 f.close()
 print pin
-#message="\n"+raw_input("Enter data to send to pi: ")+"\0"
+#message="\n"+raw_input("Enter data to send to pi: ")+"\0"	
 try :
-    #Set the whole string
-    if str(se) == "1*1234": 
-    	s.send("SUCCESS")
-    else:
-	s.send("0")
-    print 'Message sent successfully'
-    time.sleep(1)
-    print 'Sending...'
+	#Set the whole string
+	if str(se) == "1*1234": 
+		s.send("SUCCESS")
+	else:
+		s.send("0")
+		print 'Message sent successfully'
+    		time.sleep(1)
+    		print 'Sending...'
 except socket.error:
-    #Send failed
-    print 'Send failed'
-    sys.exit()
+    		#Send failed
+    		print 'Send failed'
+    		sys.exit()
 
 def recv_timeout(the_socket,timeout=2):
     #make socket non blocking

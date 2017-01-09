@@ -33,16 +33,19 @@ except socket.gaierror:
 print 'Socket Connected to ' + host + ' on ip ' + remote_ip
 
 #Send some data to remote server
-#f= open('a.txt','r')
-#se=f.read()
-#sr = "\n"+str(se)+"\n"
-#message = sr
-#f.close()
-#print message
-message="\n"+raw_input("Enter data to send to pi: ")+"\n"
+f = open('a.txt','r')
+se=f.read()
+sr = "\n"+str(se)+"\0"
+pin = sr
+f.close()
+print pin
+#message="\n"+raw_input("Enter data to send to pi: ")+"\0"
 try :
     #Set the whole string
-    s.send(message)
+    if str(se) == "1*1234": 
+    	s.send("SUCCESS")
+    else:
+	s.send("0")
     print 'Message sent successfully'
     time.sleep(1)
     print 'Sending...'

@@ -2,7 +2,6 @@
 #define pc Serial
 SoftwareSerial esp(10, 11);
 
-
 // global variables
 char buf_out[500];
 String data_String;
@@ -16,7 +15,7 @@ String conf_tag;
 
 
 void setup() {
-  Serial.begin(115200);
+  pc.begin(115200);
   esp.begin(115200);
   //delay(2000);
 //  pc.println("\r\nPress a to begin process...");
@@ -48,15 +47,12 @@ void setup() {
   }
   
   delay(2000);
-  
-//  //IP ADDRESS DISPLAY//
-//  esp.println("AT+CIFSR");
-//  read_data_upto('"',buf_out,'"');
-//  pc.println(buf_out);
-//  
-//  delay(2000);
-  /*
-  
+  String test_string;
+  int a = check_user_pin("1","1234",test_string);
+  pc.println(a);
+}  
+ 
+void client_mode_pin(String shelf_id, String pin){  
   //ESP IN CLIENT MODE//
   //SEND DATA TO PI WHICH IS RUNNING server_script.py IP:192.168.0.104, PORT:8008//
   esp.println("AT+CIPMUX=1");
@@ -68,47 +64,55 @@ void setup() {
   esp.println("AT+CIPSTART=0,\"TCP\",\"192.168.0.104\",8008");
   while(esp.available()) pc.write(esp.read());
   
-  delay(10000);
+  delay(8000);
   
-  
+  String shelf_n_id = shelf_id + "*" + pin;
   //TO-DO GET USERPIN FOR SENDING TO PI
   //SEND DATA TO PI
-  send_userpin("4444");
-  
-  //To-DO get the conf_tag for sending to pi
-  // conf_tag can only hold two values (comp),(fail)
-  send_transfer_confirmation("fail");
-  
-  */
-  
-  
-  //Server create 
-  // receive data on the pi
-  esp.println("AT+CIPMUX=1");
-  if(des_resp("OK")==true){
-    pc.println("CIPMUX SET TO 1, READY TO START SERVER");
-  }
+  pc.println(shelf_n_id);
   delay(2000);
+  send_userpin(shelf_n_id);
+  esp.println("AT+CIPCLOSE");
+  delay(1000);
   
-  esp.println("AT+CIPSERVER=1,8008");
-  delay(2000);
-  if(des_resp("OK")==true){
-    pc.println("server created");
   }
-  else{
-    pc.println(esp.readString());
-    pc.println("server not created");
-    while(1);
-  }
-  delay(2000);
 
-  while(esp.available()) pc.write(esp.read());
-//
-  read_data_upto('\0',buf_out,':');
-  pc.println(buf_out);
-  //TO-DO WRITE  buf_out TO FILE ON THE SD-CARD IN ARDUINO
-
-
+int server_mode(String list_of_items){
+   //Server create 
+   //receive data on the pi
+    esp.println("AT+CIPMUX=1");
+    if(des_resp("OK")==true){
+      pc.println("CIPMUX SET TO 1, READY TO START SERVER");
+    }
+    delay(2000);
+    
+    esp.println("AT+CIPSERVER=1,8008");
+    delay(2000);
+    if(des_resp("OK")==true){
+      pc.println("server created");
+    }
+    else{
+      pc.println(esp.readString());
+      pc.println("server not created");
+      return 2;
+    }
+  
+    delay(2000);
+    while(esp.read()!=':');
+    String message;
+    while(esp.read()!='\0'){
+      message = esp.readString();
+    }
+    pc.println(message);
+    if(message = "0")
+    {
+      delay(2000);
+      return 0;
+    }
+    else
+    list_of_items = message;
+    delay(2000);
+    return 1;
 }
   
   //*****extra functions******//
@@ -119,76 +123,57 @@ bool des_resp(char resp[]){
         return true;
      }
     return false;
-  }
+}
   
   
-void read_data_upto(char terminator,char buf[]){
-  char buff;
-  int i=0;
-  if(esp.available())
-  {
-  buff=esp.read();
-  while(buff!=terminator)
-  {
-  buff=esp.read();
-  if(buff!=terminator) buf[i++]=buff;
-  }
-  buf[i]='\0';
-  }
-}
-
-void read_data_upto(char terminator,char buf[],char begin_char)
-{
-  char buff;
-  int i=0;
-  if(esp.available())
-  {
-    buff=esp.read();
-    while(buff!=begin_char || buff!=begin_char+1)
-    {
-      buff=esp.read();
-    }
-    buff=terminator+1;
-    while(buff!=terminator)
-    {
-      buff=esp.read();
-      if(buff!=terminator) buf[i++]=buff;
-    }
-  buf[i]='\0';
-  }
-}
-
-void send_data(int len){
-  pc.println("enter length of data to send:");
-  delay(3000);
-  int data_length = pc.parseInt();
-  delay(1000);
-  pc.println(data_length);
-  delay(1000);
-  pc.println("enter data to send to pi:");
-  delay(3000);
-  String cipsend = "AT+CIPSEND=0,";
-  pc.println(cipsend.concat(data_length));
-}
+void send_RFID(String RFID){
+  esp.println("AT+CIPSEND=0,12");
+  delay(2000);
+  esp.println(RFID);
+  delay(2000);
+ }
 
 void send_userpin(String pin){
-  esp.println("AT+CIPSEND=0,4");
+  esp.println("AT+CIPSEND=0,6");
   delay(2000);
   esp.println(pin);
   delay(2000);
   
 }
 
-void send_transfer_confirmation(String conf_tag){
-  esp.println("AT+CIPSEND=0,4");
+
+int check_user_pin(String shelf_id, String pin,String list_of_items){
+ client_mode_pin(shelf_id, pin);
+ int status = server_mode(list_of_items);
+ return status;
+}
+
+void shelf_withdrawal(String RFID){
+    //ESP IN CLIENT MODE//
+  //SEND DATA TO PI WHICH IS RUNNING server_script.py IP:192.168.0.104, PORT:8008//
+  esp.println("AT+CIPMUX=1");
+  if(des_resp("OK")==true){
+    pc.println("CIPMUX SET TO 1, READY TO START TCP");
+  }
+  delay(5000);
+  // create a cleint 
+  esp.println("AT+CIPSTART=0,\"TCP\",\"192.168.0.104\",8008");
+  while(esp.available()) pc.write(esp.read());
+  
+  delay(8000);
+  
+  //TO-DO GET RFID FOR SENDING TO PI
+  pc.println(RFID);
   delay(2000);
-  esp.println(conf_tag);
-  delay(2000);
+  send_userpin(RFID);
+  esp.println("AT+CIPCLOSE");
+  delay(1000);
+
 }
 
 void loop() {
 
-while(pc.available()) esp.write(pc.read());
+//while(pc.available()) esp.write(pc.read());
 while(esp.available()) pc.write(esp.read());
 
 

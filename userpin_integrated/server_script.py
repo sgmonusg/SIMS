@@ -31,6 +31,9 @@ def clientthread(conn):
         data = conn.recv(1024)
         reply = 'Message Received at the server!\n'
         print data
+	f = open('a.txt','w')
+	f.write(data)
+	f.close()
         if not data:
             break
 

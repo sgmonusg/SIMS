@@ -1,0 +1,27 @@
+/*
+	esp_comm.h - Library for sending and receiving using esp AT commands
+*/
+
+#ifndef esp_comm_h
+#define esp_comm_h
+
+#include "Arduino.h"
+//#include "String.h"
+#include "SoftwareSerial.h"
+
+class esp_comm
+{
+ public:
+   int check_user_pin(String shelf_id, String pin,String list_of_items);
+   void client_mode_pin(String shelf_id, String pin);
+   int server_mode(String list_of_items);
+   void shelf_withdrawal(String RFID);
+   bool des_resp(char resp[]);
+   String shelf_id;
+   String pin;
+   String list_of_items;
+   char resp[];
+   SoftwareSerial esp(int,int);
+};
+
+#endif

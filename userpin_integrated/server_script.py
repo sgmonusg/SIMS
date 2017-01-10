@@ -2,7 +2,7 @@ import socket
 import sys
 from thread import *
 
-HOST = '192.168.0.104'   # Symbolic name meaning all available interfaces
+HOST = '192.168.0.114'   # Symbolic name meaning all available interfaces
 PORT = 8008
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -22,14 +22,14 @@ print 'Socket now listening'
 #Function for handling connections
 def clientthread(conn):
     #Sending message to connected client
-    conn.send('Welcome to the server. Receving Data...\n') #send only takes string
+   # conn.send('Welcome to the server. Receving Data...\n') #send only takes string
 
     #infinite loop so that function do not terminate and thread do not end.
     while True:
 
         #Receiving from client
         data = conn.recv(1024)
-        reply = 'Message Received at the server!\n'
+        #reply = 'Message Received at the server!\n'
         print data
 	f = open('a.txt','w')
 	f.write(data)
@@ -37,7 +37,7 @@ def clientthread(conn):
         if not data:
             break
 
-        conn.sendall(reply)
+       #conn.sendall(reply)
 
     conn.close()
 
